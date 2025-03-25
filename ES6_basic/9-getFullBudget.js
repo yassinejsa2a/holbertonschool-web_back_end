@@ -11,4 +11,4 @@ export default function getFullBudgetObject(income, gdp, capita) {
     };
   
     return fullBudget;
-  }
+}
