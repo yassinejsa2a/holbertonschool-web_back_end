@@ -1,0 +1,12 @@
+{
+  "name": "mon-projet",
+  "version": "1.0.0",
+  "description": "Projet Node avec Jest, Babel et ESLint",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "author": "TonNom",
+  "license": "ISC"
+}
