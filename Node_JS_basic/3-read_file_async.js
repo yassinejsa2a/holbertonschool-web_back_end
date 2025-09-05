@@ -2,37 +2,36 @@ const fs = require('fs').promises;
 
 async function countStudents(path) {
   try {
-    const data = await fs.readFile(path, 'utf8');
+    const data = await fs.readFile(path, 'utf-8');
+
     const lines = data.split('\n').filter((line) => line.trim() !== '');
-    if (lines.length <= 1) {
-      return 'Number of students: 0';
-    }
 
-    const students = lines.slice(1)
-      .map((line) => line.split(','))
-      .filter((arr) => arr.length === 4);
+    const students = lines.slice(1);
 
-    const total = students.length;
-    const fields = {};
+    let result = (`Number of students: ${students.length}\n`);
 
-    for (const student of students) {
-      const field = student[3];
-      const firstname = student[0];
-      if (!fields[field]) {
-        fields[field] = [];
+    const fieldGroups = {};
+
+    students.forEach((student) => {
+      const fields = student.split(',');
+      const firstName = fields[0];
+      const field = fields[3];
+
+      if (!fieldGroups[field]) {
+        fieldGroups[field] = [];
       }
-      fields[field].push(firstname);
+      fieldGroups[field].push(firstName);
+    });
+    for (const field in fieldGroups) {
+      if (Object.prototype.hasOwnProperty.call(fieldGroups, field)) {
+        const studentsList = fieldGroups[field].join(', ');
+        result += (`Number of students in ${field}: ${fieldGroups[field].length}. List: ${studentsList}\n`);
+      }
     }
-
-    let output = `\nNumber of students: ${total}`;
-    for (const [field, names] of Object.entries(fields)) {
-      output += `\nNumber of students in ${field}: ${names.length}. List: ${names.join(', ')}`;
-    }
-
-    return output;
-  } catch (err) {
-    throw new Error('\nCannot load the database');
+    result = result.trim();
+    return result;
+  } catch (error) {
+    throw new Error('Cannot load the database');
   }
 }
-
 module.exports = countStudents;
