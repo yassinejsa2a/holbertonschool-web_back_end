@@ -1,37 +1,34 @@
 const fs = require('fs').promises;
 
 async function countStudents(path) {
-  try {
-    const data = await fs.readFile(path, 'utf-8');
+  return fs.readFile(path, 'utf8')
+    .then((data) => {
+      const lines = data.split('\n');
+      const students = lines.slice(1);
+      const validStudents = students.filter((line) => line.trim() !== '');
+      const total = validStudents.length;
 
-    const lines = data.split('\n').filter((line) => line.trim() !== '');
+      console.log(`Number of students: ${total}`);
 
-    const students = lines.slice(1);
+      const fields = {};
+      validStudents.forEach((line) => {
+        const parts = line.split(',');
+        const firstname = parts[0].trim();
+        const field = parts[3].trim();
+        if (!fields[field]) {
+          fields[field] = [];
+        }
+        fields[field].push(firstname);
+      });
 
-    let result = (`Number of students: ${students.length}\n`);
-
-    const fieldGroups = {};
-
-    students.forEach((student) => {
-      const fields = student.split(',');
-      const firstName = fields[0];
-      const field = fields[3];
-
-      if (!fieldGroups[field]) {
-        fieldGroups[field] = [];
+      for (const field in fields) {
+        if (Object.prototype.hasOwnProperty.call(fields, field)) {
+          const list = fields[field].join(', ');
+          console.log(`Number of students in ${field}: ${fields[field].length}. List: ${list}`);
+        }
       }
-      fieldGroups[field].push(firstName);
-    });
-    for (const field in fieldGroups) {
-      if (Object.prototype.hasOwnProperty.call(fieldGroups, field)) {
-        const studentsList = fieldGroups[field].join(', ');
-        result += (`Number of students in ${field}: ${fieldGroups[field].length}. List: ${studentsList}\n`);
-      }
-    }
-    result = result.trim();
-    return result;
-  } catch (error) {
-    throw new Error('Cannot load the database');
-  }
+    })
+    .catch(() => Promise.reject(new Error('Cannot load the database')));
 }
+
 module.exports = countStudents;
